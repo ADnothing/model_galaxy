@@ -37,3 +37,27 @@ def plots(ajust_args, X, Y, mod):
         print("a = {:.3} (+/-) {:.3} ; b = {:.3} (+/-) {:.3} ; c = {:.3} (+/-) {:.3}".format(popt[0], var[0][0], popt[1], var[1][1], popt[2], var[2][2]))
     else:
         print("ERROR : No models of this format ready at the moment")
+        
+
+def plotQEXPY(MOD, X, Y):
+    """
+    
+
+    Parameters
+    ----------
+    MOD : Model chosed.
+    X : Measurement array of the X datas.
+    Y : Measurement array of the Y datas.
+
+    Returns
+    -------
+    None.
+    Plots the figure with uncertainty and prints all the results of the fit
+
+    """
+    
+    qplt.plot(X, Y)
+    figure = qplt.get_plot()
+    figure.error_bars
+    resultats = figure.fit(model=MOD)
+    figure.show()
