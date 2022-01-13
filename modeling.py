@@ -59,5 +59,6 @@ def plotQEXPY(MOD, X, Y):
     qplt.plot(X, Y)
     figure = qplt.get_plot()
     figure.error_bars
-    resultats = figure.fit(model=MOD)
+    results = figure.fit(model=MOD)
     figure.show()
+    print(results)
