@@ -8,6 +8,7 @@ lib : contains all the python's library used in the code
 models : defins the diffrent model used for this project
 modeling : contain the function 'plots' that plot the datas with the chosed models with optimized
            parameters and their variances
+best_scen : code written by Damien Le Borgne with a modification to save in .csv the data collected (don't work alone, need other files and code from Damien Le Borgne)
 main : if you have the data.csv file in the right path, ask you the model you want to test
        and uses the function 'plots'
        
