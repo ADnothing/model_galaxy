@@ -458,5 +458,25 @@ def main():
 
   make_demo(r) # plot the predicted counts for the best fit
 
+  obj.writerow(r)
+  for i in range(ecarts[0].size):
+    obj2.writerow(ecarts[i][i])
+
 if __name__ == "__main__":
+  if os.path.isfile('data.csv') and os.path.isfile('data_err.csv'): #modifier le path enventuellement
+    fichier = open('data.csv', 'a', newline='')
+    fichier2 = open('data_err.csv', 'a', newline='')
+    obj = csv.writer(fichier)
+    obj2 = csv.writer(fichier2)
+  else:
+    fichier = open('data.csv', 'w', newline='')
+    fichier2 = open('data_err.csv', 'w', newline='')
+    obj = csv.writer(fichier)
+    obj2 = csv.writer(fichier2)
+    obj.writerow(np.array(['infall', 'sf', 'winds']))
+    obj2.writerow(np.array(['infall', 'sf', 'winds']))
+
   main()
+
+  fichier.close()
+  fichier2.close()
