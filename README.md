@@ -1,6 +1,8 @@
 # model_galaxy
 Modelisation on galaxy evolution using PEGASE-HR
 
+This is a labwork done in internship at IAP directed by Damien Le Borgne (https://github.com/damleborgne)
+Thoses codes use his work (https://github.com/damleborgne/PEGASE-HR and https://github.com/damleborgne/pypeg)
 
 lib : contains all the python's library used in the code
 models : defins the diffrent model used for this project
