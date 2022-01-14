@@ -7,6 +7,7 @@ import pypeg.pypegm as pp
 import pypeg.populations as ppop
 import os
 import scipy
+import csv
 from scipy.interpolate import InterpolatedUnivariateSpline 
 from scipy.interpolate import interp1d
 from astropy.io import fits
@@ -394,6 +395,8 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
         H = result.jac.T @ result.jac
         Sigma = np.linalg.inv(H) #inverse H
 
+    Sigma = np.array([[2.43185893e-02, 6.63419748e-03, 5.20506344e-29], [6.63419748e-03, 4.33423989e-02, 9.30052034e-29], [5.20506344e-29, 9.30052034e-29, 3.03238132e-27]])
+
     #numpy savez ??
     
     #MCMC method
@@ -402,8 +405,10 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
     #resultats
     res=ch.mean()
     dev=ch.covariance().diagonal()**.5
+    cov=ch.covariance()
     print("Acceptance",ch.acceptance())
     print("Moyenne",res)
+    print("Covariance LM method",Sigma)
     print("Covariance mesurée par MCMC",ch.covariance())
     print("Déviation std mesurée par MCMC",dev)
 
@@ -415,6 +420,8 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
         plt.xlabel("$tinfall$", fontsize=20)
         plt.ylabel("$tSF$", fontsize=20)
         ch.plot_brown(0,1)
+        plt.savefig('step_{:1d}_tinfall0_{:08.2f}_tsf0_{:08.2f}_twinds0_{:08.2f}.fits'.\
+        format(steps,x0[0],x0[1],x0[2]))
         
         if dparameters==3:
             plt.figure(figsize=(5,5))
@@ -430,7 +437,7 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
             plt.ylabel("$twind$", fontsize=20)
             ch.plot_brown(0,2)
         
-    return res, dev
+    return res, dev, Sigma, cov
 
 def main():
 
@@ -441,7 +448,12 @@ def main():
   #x = np.array([1.27867174, 3.61871842, 4.30105171])# 1pop, test_params = {'tinfall':10.**x[0], 'tsf': 10.**x[1], 'twinds': 10.**x[2], 'zfor': 7., 'extinction':2}
   #make_demo(x)
   
-  x = np.array([3.45314666, 3.26105828, 4.30105171])# 1pop, test_params = {'tinfall':10.**x[0], 'tsf': 10.**x[1], 'twinds': 10.**x[2], 'zfor': 7., 'extinction':2}
+  print("Please enter model parameters :")
+  tinfall = float(input("tinfall (default is 3.45314666)=") or "3.45314666")
+  tsf = float(input("tsf (default is 3.26105828)=") or "3.26105828")
+  twinds = float(input("twinds (default is 4.30105171)=") or "4.30105171")
+
+  x = np.array([tinfall, tsf, twinds])# 1pop, test_params = {'tinfall':10.**x[0], 'tsf': 10.**x[1], 'twinds': 10.**x[2], 'zfor': 7., 'extinction':2}
   make_demo(x) # plot the predicted counts for this model
 
   def func_objective(params):
@@ -454,29 +466,49 @@ def main():
 #r = optimize.fmin_l_bfgs_b(func_objective, x0 = np.log10([1000., 1000., 20000.]),
                              #bounds = ((0., 5.), (0., 5.), (np.log10(20001.),np.log10(20001.))), 
                              #epsilon = 0.1, approx_grad=True)
-  r, ecarts = MCMC_method(func_objective, resvec,  np.log10([1000., 1000., 20000.]))
+
+  print("Please enter start parameters :")
+  tinfall0 = np.log10(float(input("tinfall_O (default is 1000)=") or "1000"))
+  tsf0 = np.log10(float(input("tsf_0 (default is 1000)=") or "1000"))
+  twinds0 = np.log10(float(input("twinds_0 (default is 20001)=") or "200001"))
+
+  nbsteps = int(input("nb_steps (default is 1000)=") or "1000")
+
+  r, ecarts, Sigma, cov = MCMC_method(func_objective, resvec,  np.log10([1000., 1000., 20000.]), 2, nbsteps)
 
   make_demo(r) # plot the predicted counts for the best fit
 
   obj.writerow(r)
-  for i in range(ecarts[0].size):
-    obj2.writerow(ecarts[i][i])
+  obj2.writerow(ecarts)
+  obj3.writerow(Sigma)
+  obj4.writerow(cov)
 
 if __name__ == "__main__":
   if os.path.isfile('data.csv') and os.path.isfile('data_err.csv'): #modifier le path enventuellement
     fichier = open('data.csv', 'a', newline='')
     fichier2 = open('data_err.csv', 'a', newline='')
+    fichier3 = open('data_sigma.csv', 'a', newline='')
+    fichier4 = open('data_cov.csv', 'a', newline='')
     obj = csv.writer(fichier)
     obj2 = csv.writer(fichier2)
+    obj3 = csv.writer(fichier3)
+    obj4 = csv.writer(fichier4)
   else:
     fichier = open('data.csv', 'w', newline='')
     fichier2 = open('data_err.csv', 'w', newline='')
+    fichier3 = open('data_sigma.csv', 'w', newline='')
+    fichier4 = open('data_cov.csv', 'w', newline='')
     obj = csv.writer(fichier)
     obj2 = csv.writer(fichier2)
+    obj3 = csv.writer(fichier3)
+    obj4 = csv.writer(fichier4)
     obj.writerow(np.array(['infall', 'sf', 'winds']))
     obj2.writerow(np.array(['infall', 'sf', 'winds']))
+    
 
   main()
 
   fichier.close()
   fichier2.close()
+  fichier3.close()
+  fichier4.close()
