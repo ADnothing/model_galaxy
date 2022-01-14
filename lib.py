@@ -6,3 +6,4 @@ import qexpy
 import qexpy.plotting as qplt
 import os
 import csv
+import random as rand
