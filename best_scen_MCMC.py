@@ -386,7 +386,7 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
         x02D=x0[:2]
         result = scipy.optimize.least_squares(resvec2D, x02D, method="lm")
         H = result.jac.T @ result.jac
-        #print(H)
+        print(H)
 
         Sigma_2D = np.linalg.inv(H) #reduces H to a 2*2 array and inverse it
         Sigma=extend(Sigma_2D) #extend it 
@@ -394,9 +394,7 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
         result = scipy.optimize.least_squares(resvec, x0, method="lm")
         H = result.jac.T @ result.jac
         Sigma = np.linalg.inv(H) #inverse H
-
-    Sigma = np.array([[2.43185893e-02, 6.63419748e-03, 5.20506344e-29], [6.63419748e-03, 4.33423989e-02, 9.30052034e-29], [5.20506344e-29, 9.30052034e-29, 3.03238132e-27]])
-
+        
     #numpy savez ??
     
     #MCMC method
@@ -406,12 +404,31 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
     res=ch.mean()
     dev=ch.covariance().diagonal()**.5
     cov=ch.covariance()
-    print("Acceptance",ch.acceptance())
+    acc=ch.acceptance()
+    print("Acceptance",acc)
     print("Moyenne",res)
     print("Covariance LM method",Sigma)
     print("Covariance mesurée par MCMC",ch.covariance())
     print("Déviation std mesurée par MCMC",dev)
-
+    
+    if acc>0.4:
+        print("Acceptance trop élevée - comparaison covariance")
+        diff=Sigma.diagonal()[:2]/dev[:2]
+        if np.abs(diff).all()>10:
+            print("On refait MCMC:")
+            Sigma=cov
+            ch = MCMC.mcmc(mcmc_step,combine_chi2([func_objective,make_uniform_prior((0,0,0),(5,5,5))]), x0, cov* (2.38**2)*1./dparameters, nstep=steps)
+            
+            res=ch.mean()
+            dev=ch.covariance().diagonal()**.5
+            cov=ch.covariance()
+            acc=ch.acceptance()
+            print("Acceptance",acc)
+            print("Moyenne",res)
+            print("Covariance LM method",Sigma)
+            print("Covariance mesurée par MCMC",ch.covariance())
+            print("Déviation std mesurée par MCMC",dev)
+        
     if plotting==True:
         
         plt.figure(figsize=(5,5))
@@ -420,7 +437,7 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
         plt.xlabel("$tinfall$", fontsize=20)
         plt.ylabel("$tSF$", fontsize=20)
         ch.plot_brown(0,1)
-        plt.savefig('step_{:1d}_tinfall0_{:08.2f}_tsf0_{:08.2f}_twinds0_{:08.2f}.fits'.\
+        plt.savefig('step_{:1d}_tinfall0_{:08.2f}_tsf0_{:08.2f}_twinds0_{:08.2f}.png'.\
         format(steps,x0[0],x0[1],x0[2]))
         
         if dparameters==3:
@@ -437,7 +454,7 @@ def MCMC_method(func_objective, resvec, x0, dparameters=2, steps=1500, plotting=
             plt.ylabel("$twind$", fontsize=20)
             ch.plot_brown(0,2)
         
-    return res, dev, Sigma, cov
+    return res, dev, Sigma, cov, acc
 
 def main():
 
@@ -468,13 +485,13 @@ def main():
                              #epsilon = 0.1, approx_grad=True)
 
   print("Please enter start parameters :")
-  tinfall0 = np.log10(float(input("tinfall_O (default is 1000)=") or "1000"))
-  tsf0 = np.log10(float(input("tsf_0 (default is 1000)=") or "1000"))
-  twinds0 = np.log10(float(input("twinds_0 (default is 20001)=") or "200001"))
+  tinfall0 = float(input("tinfall_O (default is 3)=") or "3")
+  tsf0 = float(input("tsf_0 (default is 3)=") or "3")
+  twinds0 = float(input("twinds_0 (default is 4.30105171)=") or "4.30105171")
 
   nbsteps = int(input("nb_steps (default is 1000)=") or "1000")
 
-  r, ecarts, Sigma, cov = MCMC_method(func_objective, resvec,  np.log10([1000., 1000., 20000.]), 2, nbsteps)
+  r, ecarts, Sigma, cov, acc = MCMC_method(func_objective, resvec,  np.array([tinfall0, tsf0, twinds0]), 2, nbsteps)
 
   make_demo(r) # plot the predicted counts for the best fit
 
@@ -482,29 +499,36 @@ def main():
   obj2.writerow(ecarts)
   obj3.writerow(Sigma)
   obj4.writerow(cov)
-
+  obj5.writerow(acc)
+  
 if __name__ == "__main__":
   if os.path.isfile('data.csv') and os.path.isfile('data_err.csv'): #modifier le path enventuellement
     fichier = open('data.csv', 'a', newline='')
     fichier2 = open('data_err.csv', 'a', newline='')
     fichier3 = open('data_sigma.csv', 'a', newline='')
     fichier4 = open('data_cov.csv', 'a', newline='')
+    fichier5 = open('data_acc.csv', 'a', newline='')
     obj = csv.writer(fichier)
     obj2 = csv.writer(fichier2)
     obj3 = csv.writer(fichier3)
     obj4 = csv.writer(fichier4)
+    obj5 = csv.writer(fichier5)
   else:
     fichier = open('data.csv', 'w', newline='')
     fichier2 = open('data_err.csv', 'w', newline='')
     fichier3 = open('data_sigma.csv', 'w', newline='')
     fichier4 = open('data_cov.csv', 'w', newline='')
+    fichier5 = open('data_acc.csv', 'w', newline='')
     obj = csv.writer(fichier)
     obj2 = csv.writer(fichier2)
     obj3 = csv.writer(fichier3)
     obj4 = csv.writer(fichier4)
+    obj5 = csv.writer(fichier5)
     obj.writerow(np.array(['infall', 'sf', 'winds']))
     obj2.writerow(np.array(['infall', 'sf', 'winds']))
-    
+    obj3.writerow(np.array(['Sigma']))
+    obj4.writerow(np.array(['cov']))
+    obj5.writerow(np.array(['acc']))
 
   main()
 
@@ -512,3 +536,4 @@ if __name__ == "__main__":
   fichier2.close()
   fichier3.close()
   fichier4.close()
+  fichier5.close()
