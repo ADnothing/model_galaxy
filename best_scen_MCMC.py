@@ -17,6 +17,7 @@ from astropy import cosmology
 from copy import deepcopy
 from scipy import optimize
 from scipy.optimize import minimize
+import pandas as pd
 
 import MCMC #some useful functions for the MCMC method
 
@@ -465,10 +466,11 @@ def main():
   #x = np.array([1.27867174, 3.61871842, 4.30105171])# 1pop, test_params = {'tinfall':10.**x[0], 'tsf': 10.**x[1], 'twinds': 10.**x[2], 'zfor': 7., 'extinction':2}
   #make_demo(x)
   
-  print("Please enter model parameters :")
-  tinfall = float(input("tinfall (default is 3.45314666)=") or "3.45314666")
-  tsf = float(input("tsf (default is 3.26105828)=") or "3.26105828")
-  twinds = float(input("twinds (default is 4.30105171)=") or "4.30105171")
+  param = pd.read_csv('param.csv')
+  
+  tinfall = param['T_infall'].values[0]
+  tsf = param['T_sf'].values[0]
+  twinds = 4.30105171
 
   x = np.array([tinfall, tsf, twinds])# 1pop, test_params = {'tinfall':10.**x[0], 'tsf': 10.**x[1], 'twinds': 10.**x[2], 'zfor': 7., 'extinction':2}
   make_demo(x) # plot the predicted counts for this model
@@ -484,12 +486,11 @@ def main():
                              #bounds = ((0., 5.), (0., 5.), (np.log10(20001.),np.log10(20001.))), 
                              #epsilon = 0.1, approx_grad=True)
 
-  print("Please enter start parameters :")
-  tinfall0 = float(input("tinfall_O (default is 3)=") or "3")
-  tsf0 = float(input("tsf_0 (default is 3)=") or "3")
-  twinds0 = float(input("twinds_0 (default is 4.30105171)=") or "4.30105171")
+  tinfall0 = param['T0_infall'].values[0]
+  tsf0 = param['T0_sf'].values[0]
+  twinds0 = 4.30105171
 
-  nbsteps = int(input("nb_steps (default is 1000)=") or "1000")
+  nbsteps = 1000
 
   r, ecarts, Sigma, cov, acc = MCMC_method(func_objective, resvec,  np.array([tinfall0, tsf0, twinds0]), 2, nbsteps)
 
