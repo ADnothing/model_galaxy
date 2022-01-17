@@ -4,11 +4,11 @@ fichier = open('param.csv', 'w', newline='')
 obj = csv.writer(fichier)
 obj.writerow(np.array(['T0_infall', 'T0_sf', 'T_infall', 'T_sf']))
 
-a = np.array([[rand.uniform(0.1, 5.0), rand.uniform(0.0, 5.0), np.log10(2800), np.log10(1400)],
-              [rand.uniform(0.1, 5.0), rand.uniform(0.0, 5.0), np.log10(3500), np.log10(2500)],
-              [rand.uniform(0.1, 5.0), rand.uniform(0.0, 5.0), np.log10(6000), np.log10(5710)],
-              [rand.uniform(0.1, 5.0), rand.uniform(0.0, 5.0), np.log10(8000), np.log10(10000)],
-              [rand.uniform(0.1, 5.0), rand.uniform(0.0, 5.0), np.log10(7000), np.log10(14300)]])
+a = np.array([[rand.uniform(0.1, 5.0), rand.uniform(0.1, 5.0), np.log10(2800), np.log10(1400)],
+              [rand.uniform(0.1, 5.0), rand.uniform(0.1, 5.0), np.log10(3500), np.log10(2500)],
+              [rand.uniform(0.1, 5.0), rand.uniform(0.1, 5.0), np.log10(6000), np.log10(5710)],
+              [rand.uniform(0.1, 5.0), rand.uniform(0.1, 5.0), np.log10(8000), np.log10(10000)],
+              [rand.uniform(0.1, 5.0), rand.uniform(0.1, 5.0), np.log10(7000), np.log10(14300)]])
 
 for i in a:
     obj.writerow(i)
