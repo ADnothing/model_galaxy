@@ -6,6 +6,8 @@ Thoses codes use his work (https://github.com/damleborgne/PEGASE-HR and https://
 
 Formation_Galaxies : is a work (mostly in french) about the formation of galaxies
 
+##K Folder pypeg_modeling
+
 lib : contains all the python's library used in the code
 
 models : defins the diffrent model used for this project for scipy
