@@ -35,3 +35,19 @@ the column winds contains the age of the galaxy where the galactitc winds begin 
 The last column is not used at the moment but using the PEGASE-HR simulation we still got it. We may use it later so we keep saving it.
 
 The Param.csv file contains initials parameters and aimed parameters for an MCMC algorithm.
+
+## Folder cosmo
+
+In here, we use the COSMO catalogues (https://cosmos2020.calet.org/catalogues/). We use the file : COSMOS2020_CLASSIC_R1_v2.0.fits.
+
+To understand the catalogues and how to use it, you should go to https://github.com/cosmic-dawn/cosmos2020-readcat and also read https://cosmos2020.calet.org/catalogues/COSMOS2020_CLASSIC_R1_v2.0.header.
+
+libraies : contains all the libraries we use here.
+
+select : selects the data of the subaru telescop for filters B, V and IB827 (http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?id=Subaru/Suprime.IB827&&mode=browse&gname=Subaru&gname2=Suprime). The datas are separated for diffrent redshift intervals (0<z<0.5 ; 0.5<z<1 ; ...) you don't have to run it if you want just dowload each zn.npz.
+
+models : contains diffrent models we crated using pypeg.
+
+ploting : plots the observations with the models
+
+binning : file that https://github.com/damleborgne gaved us to plot the oberved galaxies as bins.
