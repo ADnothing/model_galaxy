@@ -50,4 +50,4 @@ models : contains diffrent models we crated using pypeg.
 
 ploting : plots the observations with the models
 
-binning : file that https://github.com/damleborgne gaved us to plot the oberved galaxies as bins.
+binning : file that Damien Le Borgne gaved us to plot the oberved galaxies as bins.
