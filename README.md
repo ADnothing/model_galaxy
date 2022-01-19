@@ -23,6 +23,8 @@ main : if you have the data.csv file in the right path, ask you the model you wa
        
 alternatuve : is an alternative main, it uses the 'plotQEXPY' function of the file modeling
 
+automat : is a code to use best_scen_MCMC automaticly to compute with a huge amount of steps and as much data as we want
+
 best_scen_MCMC : is a modification of best_scen but it uses the MCMC method
        
 The data.csv file here is just an example of the format used same thing for data_err.csv but with the uncertainty,
